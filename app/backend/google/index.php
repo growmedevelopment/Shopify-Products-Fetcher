@@ -48,7 +48,7 @@ $env = parse_ini_file(dirname(__DIR__, 2) . '/.env');
       $prepared_product['brand'] ?? '',
       $prepared_product['sku'] ?? '',
       $prepared_product['condition'] ?? 'new',
-      $prepared_product['google_product_category'] ?? '',
+      $prepared_product['product_type'] ?? '',
       $prepared_product['custom_label_0'] ?? '',
     ];
   }

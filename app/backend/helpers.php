@@ -193,7 +193,7 @@ function flattenProduct(array $productNode): array {
     'brand' => $productNode['vendor'] ?? '',
     'sku' => $productNode['variants']['edges'][0]['node']['sku'] ?? '',
     'condition' => 'new',
-    'google_product_category' => $productNode['productType'] ?? '',
+    'product_type' => $productNode['productType'] ?? '',
     'custom_label_0' => getCustomLabel($productNode['productType']) ?? '',
   ];
 }
