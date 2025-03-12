@@ -10,61 +10,62 @@ function log_exception(Exception $e): void {
 }
 
 /**
- * Fetches product data from the Shopify API.
+ * Fetches all products from Shopify using concurrent requests.
  */
 function fetch_products(array $env): array {
   $graphql_endpoint = "https://barbecues-galore.myshopify.com/admin/api/2025-01/graphql.json";
   $access_token = $env['SHOPIFY_ACCESS_TOKEN'];
   $all_products = [];
 
-  // Track cursor positions for pagination
+  // Start with an initial cursor
   $cursors = [null];
-  $active_requests = 5; // Number of concurrent requests
+  $active_requests = 10; // Number of concurrent requests
 
   try {
-    $multiHandle = curl_multi_init();
-    $handles = [];
+    while (!empty($cursors)) {
+      $multiHandle = curl_multi_init();
+      $handles = [];
 
-    // Create initial batch of requests
-    for ($i = 0; $i < $active_requests; $i++) {
-      if (!empty($cursors)) {
+      // Create up to $active_requests concurrent requests
+      for ($i = 0; $i < $active_requests && !empty($cursors); $i++) {
         $cursor = array_shift($cursors);
         $ch = createShopifyCurlHandle($graphql_endpoint, $access_token, $cursor);
         curl_multi_add_handle($multiHandle, $ch);
         $handles[] = $ch;
       }
+
+      // Execute all requests simultaneously
+      do {
+        $status = curl_multi_exec($multiHandle, $running);
+        curl_multi_select($multiHandle);
+      } while ($running > 0);
+
+      // Process responses
+      foreach ($handles as $ch) {
+        $response = curl_multi_getcontent($ch);
+        curl_multi_remove_handle($multiHandle, $ch);
+        curl_close($ch);
+
+        $data = json_decode($response, true);
+
+        // Handle API errors
+        if (isset($data['errors'])) {
+          throw new Exception("Shopify API Error: " . json_encode($data['errors']));
+        }
+
+        // Store retrieved products
+        foreach ($data['data']['products']['edges'] ?? [] as $productEdge) {
+          $all_products[] = $productEdge['node'];
+        }
+
+        // Add new cursors if more pages exist
+        if ($data['data']['products']['pageInfo']['hasNextPage'] ?? false) {
+          $cursors[] = $data['data']['products']['pageInfo']['endCursor'];
+        }
+      }
+
+      curl_multi_close($multiHandle);
     }
-
-    do {
-      $status = curl_multi_exec($multiHandle, $running);
-      curl_multi_select($multiHandle);
-    } while ($running > 0);
-
-    // Process responses
-    foreach ($handles as $ch) {
-      $response = curl_multi_getcontent($ch);
-      curl_multi_remove_handle($multiHandle, $ch);
-      curl_close($ch);
-
-      $data = json_decode($response, true);
-
-      // Handle errors
-      if (isset($data['errors'])) {
-        throw new Exception("Shopify API Error: " . json_encode($data['errors']));
-      }
-
-      // Store products
-      foreach ($data['data']['products']['edges'] ?? [] as $productEdge) {
-        $all_products[] = $productEdge['node'];
-      }
-
-      // Add next page cursor if available
-      if ($data['data']['products']['pageInfo']['hasNextPage'] ?? false) {
-        $cursors[] = $data['data']['products']['pageInfo']['endCursor'];
-      }
-    }
-
-    curl_multi_close($multiHandle);
   } catch (Exception $e) {
     log_exception($e);
     return [];
@@ -72,6 +73,7 @@ function fetch_products(array $env): array {
 
   return $all_products;
 }
+
 /**
  * Creates a Shopify GraphQL cURL handle.
  */
@@ -79,7 +81,13 @@ function createShopifyCurlHandle(string $endpoint, string $token, ?string $curso
   $query = <<<GQL
     query ProductsQuery(\$cursor: String) {
         products(first: 250, after: \$cursor) {
-            edges { node { id title handle descriptionHtml vendor productType images(first: 1) { edges { node { url } } } variants(first: 10) { edges { node { price inventoryQuantity sku image { url } } } } } }
+            edges { 
+                node { 
+                    id title handle descriptionHtml vendor productType 
+                    images(first: 1) { edges { node { url } } } 
+                    variants(first: 2) { edges { node { price inventoryQuantity sku image { url } } } } 
+                } 
+            }
             pageInfo { hasNextPage endCursor }
         }
     }
@@ -99,7 +107,6 @@ function createShopifyCurlHandle(string $endpoint, string $token, ?string $curso
 
   return $ch;
 }
-
 /**
  * Cleans and trims text, removes HTML, and limits length.
  */
@@ -164,45 +171,4 @@ function flattenProduct(array $productNode): array {
  */
 function createProductsArray(array $products): array {
   return array_map('flattenProduct', $products);
-}
-
-/**
- * Creates, saves, and displays a CSV file.
- */
-
-function createAndDisplayCsvFile(string $file_name, array $data): void {
-  try {
-    $file_path = __DIR__ . DIRECTORY_SEPARATOR . $file_name;
-    $file = fopen($file_path, 'w');
-
-    if (!$file) {
-      throw new Exception('Unable to open the file for writing.');
-    }
-
-    // Add UTF-8 BOM for Excel compatibility
-    fwrite($file, "\xEF\xBB\xBF");
-
-    if (!empty($data) && is_array($data[0]) && array_keys($data[0]) !== range(0, count($data[0]) - 1)) {
-      fputcsv($file, array_keys($data[0]));
-    }
-
-    foreach ($data as $row) {
-      if (!fputcsv($file, $row)) {
-        throw new Exception('Error writing data to CSV file.');
-      }
-    }
-
-    fclose($file);
-
-    if (file_exists($file_path)) {
-      header('Content-Type: text/csv');
-      header('Content-Disposition: inline; filename="' . basename($file_name) . '"');
-      readfile($file_path);
-    } else {
-      throw new Exception('CSV file does not exist after writing.');
-    }
-  } catch (Exception $e) {
-    log_exception($e);
-    http_response_code(500);
-  }
 }

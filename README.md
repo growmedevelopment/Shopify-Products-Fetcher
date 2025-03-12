@@ -80,7 +80,7 @@ This will:
 Once the Docker containers are running, execute:
 
 ```shell 
-  docker exec -it php-container php /app/backend/gmc/index.php
+  docker exec -it php-container php /app/backend/google/index.php
 ```
 
 This will fetch Shopify products and save them as products.csv.
