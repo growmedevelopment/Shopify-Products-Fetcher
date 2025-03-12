@@ -21,9 +21,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
 
 require_once dirname(__DIR__, 1) . '/backend/helpers.php';
 
+// Load the .env file
+$env = parse_ini_file(dirname(__DIR__, 1) . '/.env');
+
 try {
   // Fetch the data from Algolia API
-  $products = fetch_products();
+  $productsData = fetch_products($env);
+  $products = createProductsArray($productsData);
 
   // Prepare the response with the received data
   $response = [
