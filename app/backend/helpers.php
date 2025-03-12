@@ -189,7 +189,7 @@ function flattenProduct(array $productNode): array {
     'availability' => ($productNode['variants']['edges'][0]['node']['inventoryQuantity'] ?? 0) > 0 ? 'in_stock' : 'out_of_stock',
     'price' => $productNode['variants']['edges'][0]['node']['price'] ?? '',
     'brand' => $productNode['vendor'] ?? '',
-    'gtin' => $productNode['variants']['edges'][0]['node']['sku'] ?? '',
+    'sku' => $productNode['variants']['edges'][0]['node']['sku'] ?? '',
     'condition' => 'new',
     'google_product_category' => $productNode['productType'] ?? '',
     'custom_label_0' => getCustomLabel($productNode['productType']) ?? '',
