@@ -79,20 +79,40 @@ function fetch_products(array $env): array {
  */
 function createShopifyCurlHandle(string $endpoint, string $token, ?string $cursor): CurlHandle|false {
   $query = <<<GQL
-    query ProductsQuery(\$cursor: String) {
-        products(first: 250, after: \$cursor) {
+    query ProductsQuery {
+        products(first: 15) {  # Fetch ONLY 5 products
             edges { 
                 node { 
-                    id title handle descriptionHtml vendor productType 
+                    id 
+                    title 
+                    handle 
+                    descriptionHtml 
+                    vendor 
+                    productType 
                     images(first: 1) { edges { node { url } } } 
                     variants(first: 2) { edges { node { price inventoryQuantity sku image { url } } } } 
                 } 
             }
-            pageInfo { hasNextPage endCursor }
         }
     }
     GQL;
 
+
+  //  $query = <<<GQL
+//    query ProductsQuery(\$cursor: String) {
+//        products(first: 250, after: \$cursor) {
+//            edges {
+//                node {
+//                    id title handle descriptionHtml vendor productType
+//                    images(first: 1) { edges { node { url } } }
+//                    variants(first: 2) { edges { node { price inventoryQuantity sku image { url } } } }
+//                }
+//            }
+//            pageInfo { hasNextPage endCursor }
+//        }
+//    }
+//    GQL;
+//
   $variables = ['cursor' => $cursor];
   $ch = curl_init($endpoint);
   curl_setopt_array($ch, [
@@ -162,7 +182,7 @@ function flattenProduct(array $productNode): array {
     'gtin' => $productNode['variants']['edges'][0]['node']['sku'] ?? '',
     'condition' => 'new',
     'google_product_category' => $productNode['productType'] ?? '',
-    'custom_label_0' => getCustomLabel($productNode['productType']),
+    'custom_label_0' => getCustomLabel($productNode['productType']) ?? '',
   ];
 }
 

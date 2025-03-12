@@ -1,0 +1,9 @@
+[2025-03-12 20:11:17] Shopify API Error: {"variables":"expected Array to be a Hash"}
+[2025-03-12 20:11:35] Shopify API Error: {"variables":"expected Array to be a Hash"}
+[2025-03-12 20:12:47] Shopify API Error: {"variables":"expected Array to be a Hash"}
+[2025-03-12 20:12:49] Shopify API Error: {"variables":"expected Array to be a Hash"}
+[2025-03-12 20:14:16] Shopify API Error: {"variables":"expected Array to be a Hash"}
+[2025-03-12 20:14:28] Shopify API Error: {"variables":"expected Array to be a Hash"}
+[2025-03-12 20:14:29] Shopify API Error: {"variables":"expected Array to be a Hash"}
+[2025-03-12 20:17:53] Shopify API Error: {"variables":"expected Array to be a Hash"}
+[2025-03-12 20:18:16] Shopify API Error: {"variables":"expected Array to be a Hash"}

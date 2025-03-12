@@ -34,19 +34,22 @@ $env = parse_ini_file(dirname(__DIR__, 2) . '/.env');
 
   // Append products to CSV data
   foreach ($products as $product) {
+
+    $prepared_product = flattenProduct($product);
+
     $csv_array[] = [
-      $product['id'] ?? '',
-      $product['title'] ?? '',
-      $product['description'] ?? '',
-      $product['link'] ?? '',
-      $product['image_link'] ?? '',
-      $product['availability'] ?? '',
-      $product['price'] ?? '',
-      $product['brand'] ?? '',
-      $product['gtin'] ?? '',
-      $product['condition'] ?? 'new', // Default to 'new' if not set
-      $product['google_product_category'] ?? '',
-      $product['custom_label_0'] ?? '',
+      $prepared_product['id'] ?? '',
+      $prepared_product['title'] ?? '',
+      $prepared_product['description'] ?? '',
+      $prepared_product['link'] ?? '',
+      $prepared_product['image_link'] ?? '',
+      $prepared_product['availability'] ?? '',
+      $prepared_product['price'] ?? '',
+      $prepared_product['brand'] ?? '',
+      $prepared_product['gtin'] ?? '',
+      $prepared_product['condition'] ?? 'new',
+      $prepared_product['google_product_category'] ?? '',
+      $prepared_product['custom_label_0'] ?? '',
     ];
   }
 
