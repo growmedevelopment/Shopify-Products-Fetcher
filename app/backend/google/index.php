@@ -68,13 +68,16 @@ $env = parse_ini_file(dirname(__DIR__, 2) . '/.env');
   // Close file after writing
   fclose($output);
 
-  // Send headers to force CSV download
-  header('Content-Type: text/csv; charset=utf-8');
-  header("Content-Disposition: attachment; filename=" . basename($filename));
-  header('Content-Length: ' . filesize($filename));
 
-  // Read and output the file contents
-  readfile($filename);
+  // Read and display the file content in the browser
+  if (file_exists($filename)) {
+    // Set headers for plain text output
+    header('Content-Type: text/plain');
+    echo file_get_contents($filename);
+  }
+  else {
+    echo 'File does not exist.';
+  }
 
   // Delete the temporary file after serving it
   unlink($filename);

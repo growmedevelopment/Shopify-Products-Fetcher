@@ -167,11 +167,21 @@ function getCustomLabel(?string $productType): string {
 }
 
 /**
+ * Removes "gid://shopify/Product/" from a given string.
+ *
+ * @param string $gid The Shopify GID string.
+ * @return string The cleaned ID without prefix.
+ */
+function cleanShopifyGid(string $gid): string {
+  return str_replace("gid://shopify/Product/", "", $gid);
+}
+
+/**
  * Flattens a Shopify product response into a simple array.
  */
 function flattenProduct(array $productNode): array {
   return [
-    'id' => $productNode['id'] ?? '',
+    'id' => cleanShopifyGid($productNode['id']) ?? '',
     'title' => $productNode['title'] ?? '',
     'description' => cleanAndTrimText($productNode['descriptionHtml'] ?? ''),
     'link' => isset($productNode['handle']) ? "https://barbecuesgalore.ca/products/" . $productNode['handle'] : '',
