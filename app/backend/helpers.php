@@ -9,7 +9,6 @@ function log_exception(Exception $e): void {
   file_put_contents($log_file, $error_message, FILE_APPEND);
 }
 
-
 /**
  * Fetches product data from the Shopify API.
  */
@@ -170,6 +169,7 @@ function createProductsArray(array $products): array {
 /**
  * Creates, saves, and displays a CSV file.
  */
+
 function createAndDisplayCsvFile(string $file_name, array $data): void {
   try {
     $file_path = __DIR__ . DIRECTORY_SEPARATOR . $file_name;
