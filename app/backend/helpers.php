@@ -121,13 +121,13 @@ function getCustomLabel(?string $productType): string {
 
   // Define product type to label mappings
   $customLabels = [
-    'Thermometers' => 'label1',
-    'Tools & Gadgets' => 'label2',
-    'Covers & Mats > Covers' => 'label4',
-    'Seasonings' => 'test',
-    'Sauces & Spices' => 'test2',
-    'Charcoal Accessories > Fire Starters' => 'test23',
-    'Charcoal Accessories > Heat Diffusers' => 'teswefwt23',
+    'Thermometers' => 'Thermometers',
+    'Tools & Gadgets' => 'Tools and gadgets',
+    'Covers & Mats > Covers' => 'Barbecue covers',
+    'Seasonings' => 'label4',
+    'Sauces & Spices' => 'label5',
+    'Charcoal Accessories > Fire Starters' => 'label6',
+    'Charcoal Accessories > Heat Diffusers' => 'label6',
   ];
 
   // Check for a match and return the corresponding label
