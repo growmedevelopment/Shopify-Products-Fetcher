@@ -85,6 +85,33 @@ Once the Docker containers are running, execute:
 
 This will fetch Shopify products and save them as products.csv.
 
+## 🌐 API Endpoint
+
+This project includes an API to **fetch all products** from Shopify.  
+The API is accessible at:
+
+```sh
+    http://localhost/api/products.php
+```
+
+### 🛠️ Example API Response
+
+```json
+[
+  {
+    "id": "gid://shopify/Product/6615735074894",
+    "title": "Lynx Professional Power Burner - Natural Gas",
+    "handle": "lynx-professional-power-burner-natural-gas",
+    "vendor": "LYNX",
+    "productType": "Outdoor Cooking > Side Burners",
+    "image_link": "https://cdn.shopify.com/...image.jpg",
+    "availability": "in_stock",
+    "price": "4249.99",
+    "custom_label": "label1"
+  }
+]
+
+```
 ---
 
 ## 🔄 How It Works
