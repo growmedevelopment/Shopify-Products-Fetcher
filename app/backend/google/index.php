@@ -44,7 +44,7 @@ $env = parse_ini_file(dirname(__DIR__, 2) . '/.env');
       $prepared_product['link'] ?? '',
       $prepared_product['image_link'] ?? '',
       $prepared_product['availability'] ?? '',
-      $prepared_product['price'] ?? '',
+      $prepared_product['price'] ?? 0,
       $prepared_product['brand'] ?? '',
       $prepared_product['sku'] ?? '',
       $prepared_product['condition'] ?? 'new',

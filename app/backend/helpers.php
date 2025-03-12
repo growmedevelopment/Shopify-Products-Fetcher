@@ -180,6 +180,11 @@ function cleanShopifyGid(string $gid): string {
  * Flattens a Shopify product response into a simple array.
  */
 function flattenProduct(array $productNode): array {
+  $price = !empty($productNode['variants']['edges'][0]['node']['price'])
+    ? number_format((float) $productNode['variants']['edges'][0]['node']['price'], 2) . ' CAD'
+    : "Contact us for pricing";
+
+
   return [
     'id' => cleanShopifyGid($productNode['id']) ?? '',
     'title' => $productNode['title'] ?? '',
@@ -187,7 +192,7 @@ function flattenProduct(array $productNode): array {
     'link' => isset($productNode['handle']) ? "https://barbecuesgalore.ca/products/" . $productNode['handle'] : '',
     'image_link' => $productNode['images']['edges'][0]['node']['url'] ?? '',
     'availability' => ($productNode['variants']['edges'][0]['node']['inventoryQuantity'] ?? 0) > 0 ? 'in_stock' : 'out_of_stock',
-    'price' => $productNode['variants']['edges'][0]['node']['price'] ?? '',
+    'price' => $price,
     'brand' => $productNode['vendor'] ?? '',
     'sku' => $productNode['variants']['edges'][0]['node']['sku'] ?? '',
     'condition' => 'new',
