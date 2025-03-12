@@ -180,7 +180,7 @@ function cleanShopifyGid(string $gid): string {
  * Flattens a Shopify product response into a simple array.
  */
 function flattenProduct(array $productNode): array {
-  $price = !empty($productNode['variants']['edges'][0]['node']['price']) ? floatval($productNode['variants']['edges'][0]['node']['price'])."CAD" : "0 CAD";
+  $price = !empty($productNode['variants']['edges'][0]['node']['price']) ? floatval($productNode['variants']['edges'][0]['node']['price'])." CAD" : "0 CAD";
 
   return [
     'id' => cleanShopifyGid($productNode['id']) ?? '',

@@ -25,7 +25,7 @@ $env = parse_ini_file(dirname(__DIR__, 2) . '/.env');
       'availability',
       'price',
       'brand',
-      'gtin',
+      'sku',
       'condition',
       'google_product_category',
       'custom_label_0',
