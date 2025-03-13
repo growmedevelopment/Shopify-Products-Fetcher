@@ -78,41 +78,21 @@ function fetch_products(array $env): array {
  * Creates a Shopify GraphQL cURL handle.
  */
 function createShopifyCurlHandle(string $endpoint, string $token, ?string $cursor): CurlHandle|false {
-  $query = <<<GQL
-    query ProductsQuery {
-        products(first: 15) {  # Fetch ONLY 5 products
-            edges { 
-                node { 
-                    id 
-                    title 
-                    handle 
-                    descriptionHtml 
-                    vendor 
-                    productType 
-                    images(first: 1) { edges { node { url } } } 
-                    variants(first: 2) { edges { node { price inventoryQuantity sku image { url } } } } 
-                } 
+    $query = <<<GQL
+    query ProductsQuery(\$cursor: String) {
+        products(first: 250, after: \$cursor) {
+            edges {
+                node {
+                    id title handle descriptionHtml vendor productType
+                    images(first: 1) { edges { node { url } } }
+                    variants(first: 2) { edges { node { price inventoryQuantity sku image { url } } } }
+                }
             }
+            pageInfo { hasNextPage endCursor }
         }
     }
     GQL;
 
-
-  //  $query = <<<GQL
-//    query ProductsQuery(\$cursor: String) {
-//        products(first: 250, after: \$cursor) {
-//            edges {
-//                node {
-//                    id title handle descriptionHtml vendor productType
-//                    images(first: 1) { edges { node { url } } }
-//                    variants(first: 2) { edges { node { price inventoryQuantity sku image { url } } } }
-//                }
-//            }
-//            pageInfo { hasNextPage endCursor }
-//        }
-//    }
-//    GQL;
-//
   $variables = ['cursor' => $cursor];
   $ch = curl_init($endpoint);
   curl_setopt_array($ch, [
@@ -142,7 +122,7 @@ function cleanAndTrimText(string $html, int $maxLength = 5000): string {
  */
 function getCustomLabel(?string $productType): string {
   if (!$productType) {
-    return 'unknown'; // Default label for missing product type
+    return 'other'; // Default label for missing product type
   }
 
   // Define product type to label mappings
@@ -150,10 +130,11 @@ function getCustomLabel(?string $productType): string {
     'Thermometers' => 'Thermometers',
     'Tools & Gadgets' => 'Tools and gadgets',
     'Covers & Mats > Covers' => 'Barbecue covers',
-    'Seasonings' => 'label4',
-    'Sauces & Spices' => 'label5',
-    'Charcoal Accessories > Fire Starters' => 'label6',
-    'Charcoal Accessories > Heat Diffusers' => 'label6',
+    'Barbecue Parts' => 'Barbecue Parts',
+    'Seasonings' => 'Seasonings',
+    'Sauces & Spices' => 'Sauces and spices',
+    'Charcoal Accessories > Fire Starters' => 'Charcoal accessories',
+    'Charcoal Accessories > Heat Diffusers' => 'Charcoal accessories',
   ];
 
   // Check for a match and return the corresponding label
@@ -163,7 +144,7 @@ function getCustomLabel(?string $productType): string {
     }
   }
 
-  return 'unknown'; // Default if no match is found
+  return 'other'; // Default if no match is found
 }
 
 /**
